@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml"
+      layout:decorator="layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin</title>
+</head>
+<body>
+<div layout:fragment="content" id="apps-doctor">
+    <h1>Present Patient</h1>
+    <div class="row">
+    </div>
+    <div class="card">
+        <div class="table">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Patient Name</th>
+                    <th>Doctor Treatment</th>
+                    <th>Receipt</th>
+                    <th>Check Up</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="item, iter in tableData">
+                    <td>{{iter + 1}}</td>
+                    <td>{{item.patient.name}}</td>
+                    <td>{{item.doctor.name}}</td>
+                    <td>{{item.receipt}}</td>
+                    <td v-if="item.status === true">
+                        <span>Done</span>
+                    </td>
+                    <td v-else>
+                        <a v-bind:href="'/doctor/checkup/' + item.id" class="btn btn-warning">Check Up Patient</a>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script layout:fragment="scripts">
+    new Vue({
+        el: "#apps-doctor",
+        data(){
+            return {
+                tableData: [{
+                    id : '',
+                    receipt : '',
+                    status : '',
+                    doctor : {
+                        name : ''
+                    },
+                    patient : {
+                        name : ''
+                    }
+
+                }]
+            }
+        },
+        mounted(){
+            const role = localStorage.getItem("roleId");
+            if(role != 3 || role == ""){
+                window.location.href = "/login"
+            }
+            this.getPatient();
+        },
+        methods: {
+            getPatient(){
+
+                axios.get("/api/treatments").then(response => {
+                    this.tableData = response.data;
+                }).catch(error => {
+                    console.log(error)
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>

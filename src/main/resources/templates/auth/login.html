@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.0/examples/sign-in/">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          th:href="@{https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css}"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="signin.css" rel="stylesheet" th:href="@{/css/signin.css}">
+</head>
+<body class="text-center">
+<div  id="apps-login">
+    <form class="form-signin" @submit.prevent="login()">
+        <h1 class="h3 mb-3 font-weight-normal">Management Patient</h1>
+        <label for="username" class="sr-only">Username</label>
+        <input type="text" id="username" class="form-control" placeholder="Username" required autofocus v-model="loginData.username">
+        <label for="password" class="sr-only">Password</label>
+        <input type="password" id="password" class="form-control" placeholder="Password" required v-model="loginData.password">
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    </form></div>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script>
+    new Vue({
+        el: "#apps-login",
+        data(){
+            return {
+                loginData: {
+                    username : '',
+                    password : ''
+                }
+            }
+        },
+        mounted(){
+
+        },
+        methods: {
+            login : function (){
+                axios.post("/api/login", this.loginData).then(response => {
+                    if(response.data.status){
+                        //redirect
+                        localStorage.setItem('roleId', response.data.data.id_role);
+                        window.location.href = '/';
+                    }else{
+                        alert(response.data.message);
+                    }
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

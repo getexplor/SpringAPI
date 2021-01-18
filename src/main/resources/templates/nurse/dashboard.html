@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml"
+      layout:decorator="layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin</title>
+</head>
+<body>
+<div layout:fragment="content" id="apps-admin">
+    <h1>Present Patient</h1>
+    <div class="row">
+    </div>
+    <div class="card">
+        <div class="table">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Patient Name</th>
+                    <th>Patient Treatment</th>
+                    <th>Doctor Treatment</th>
+                    <th>Present</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="item, iter in tableData">
+                    <td>{{iter + 1}}</td>
+                    <td>{{item.name}}</td>
+                    <td>{{item.treatment}}</td>
+                    <td>{{item.doctor.name}}</td>
+                    <td v-if="item.status === true">
+                        <span>Present</span>
+                    </td>
+                    <td v-else>
+                        <button class="btn btn-primary" v-on:click="presentEdit(item.id)">Click to present</button>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script layout:fragment="scripts">
+    new Vue({
+        el: "#apps-admin",
+        data(){
+            return {
+                tableData: [{
+                    id : '',
+                    name : '',
+                    treatment : '',
+                    status : '',
+                    doctor : [{
+                        id : '',
+                        name : ''
+                    }]
+                }]
+            }
+        },
+        mounted(){
+            this.getPatient();
+            this.presentEdit();
+            const role = localStorage.getItem("roleId");
+            if(role != 2 || role == ""){
+                window.location.href = "/login"
+            }
+        },
+        methods: {
+            getPatient(){
+
+                axios.get("/api/patients").then(response => {
+                    this.tableData = response.data;
+                }).catch(error => {
+                    console.log(error)
+                });
+            },
+            presentEdit : function (id){
+                this.dataPatient = {
+                    status : true
+                }
+
+                axios.put('/api/nurse/' + id, this.dataPatient).then(response =>{
+                    window.location.reload();
+                    console.log(response)
+                }).catch(error => {
+                    console.log(error)
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

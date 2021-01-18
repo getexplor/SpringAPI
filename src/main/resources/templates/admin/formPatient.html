@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      layout:decorator="layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div layout:fragment="content" id="apps-form">
+        <div class="box">
+            <div class="box-body">
+
+                <div class="col-sm-12">
+                    <form class="form-horizontal" @submit.prevent="postData()">
+                        <div class="form-group">
+                            <label class="control-label">Patient Name :</label>
+                            <input type="text" class="form-control" name="name" id="name" v-model="name">
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Patient Treatment :</label>
+                            <input type="text" class="form-control" name="treatment" id="treatment" v-model="treatment">
+                        </div>
+                        <div class="form-group">
+                            <label>Select Doctor Treatment</label>
+                            <select class="form-control" id="id" name="id" v-model="id">
+                                <option v-for="item in dataDoctor" :value="item.id">{{item.name}}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary" type="submit">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script layout:fragment="scripts">
+
+    new Vue({
+        el: "#apps-form",
+        data(){
+            return {
+                name : '',
+                treatment : '',
+                status : false,
+                id : '',
+                doctor:[],
+                postPatient:[],
+                dataDoctor:[],
+                postTreatment:[]
+            }
+        },
+        mounted(){
+            // this.postData();
+            this.getDoctor();
+        },
+        methods: {
+            getDoctor(){
+                axios.get("/api/doctors").then(response => {
+                    this.dataDoctor = response.data;
+                }).catch(error => {
+                    console.log(error)
+                });
+            },
+            postData:function (){
+                this.doctor = {
+                    id: this.id
+                }
+                this.postPatient = {
+                    name : this.name,
+                    treatment : this.treatment,
+                    status : this.status,
+                    doctor: this.doctor
+                }
+                axios.post("/api/patient", this.postPatient).then(response => {
+                    if(response.data.status){
+
+                        window.location.href = "/admin"
+                    }else{
+                        alert("The Doctor Schedule already Full")
+                    }
+                }).catch(error => {
+                    console.log(error)
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

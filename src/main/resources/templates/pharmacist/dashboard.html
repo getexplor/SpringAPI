@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml"
+      layout:decorator="layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin</title>
+</head>
+<body>
+<div layout:fragment="content" id="apps-pharmacist">
+    <h1>Check out Medicine Patient</h1>
+    <div class="card">
+        <div class="table">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Patient Name</th>
+                    <th>Treatment</th>
+                    <th>Receipt</th>
+                    <th>Doctor</th>
+                    <th>Medicine</th>
+                    <th>Total Medicine</th>
+                    <th>Action</th>
+                    <th>Check Out</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="item, iter in tableData">
+                    <td>{{iter + 1}}</td>
+                    <td>{{item.treatments.patient.name}}</td>
+                    <td>{{item.treatments.patient.treatment}}</td>
+                    <td>{{item.treatments.receipt}}</td>
+                    <td>{{item.treatments.doctor.name}}</td>
+                    <td>{{item.medicine}}</td>
+                    <td>{{item.totalMedicine}}</td>
+                    <td>
+                        <a v-bind:href="'/pharmacist/medicine/' + item.id" class="btn btn-warning">Medicine</a>
+                    </td>
+                    <td v-if="item.status === true">
+                        <span>Check Out</span>
+                    </td>
+                    <td v-else>
+                        <button class="btn btn-primary" v-on:click="CheckOut(item.id)">check out</button>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script layout:fragment="scripts">
+    new Vue({
+        el: "#apps-pharmacist",
+        data(){
+            return {
+                tableData: [{
+                    id : '',
+                    totalMedicine : '',
+                    status : '',
+                    medicine : '',
+                    treatments : {
+                        receipt : '',
+                        patient:{
+                            name : '',
+                            treatment : ''
+                        },
+                        doctor : {
+                            name : ''
+                        }
+                    }
+                }]
+            }
+        },
+        mounted(){
+            const role = localStorage.getItem("roleId");
+            if(role != 4 || role == ""){
+                window.location.href = "/login"
+            }
+            this.getReceipt();
+            this.CheckOut();
+        },
+        methods: {
+            getReceipt(){
+
+                axios.get("/api/pharmacists").then(response => {
+                    this.tableData = response.data;
+                }).catch(error => {
+                    console.log(error)
+                });
+            },
+            CheckOut : function(id){
+                this.dataPatient = {
+                    status : true
+                }
+                axios.put("/api/pharmacist/checkout/" + id, this.dataPatient).then(response => {
+                    window.location.href = "/pharmacist"
+                    console.log(response)
+                }).catch(error => {
+                    console.log(error)
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

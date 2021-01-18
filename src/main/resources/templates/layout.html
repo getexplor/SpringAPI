@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title layout:title-pattern="$CONTENT_TITLE - $DECORATOR_TITLE">Management Patient</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport"/>
+
+    <!-- Latest compiled and minified CSS -->
+    <style th:replace="/shared/style"></style>
+    <style layout:fragment="style"></style>
+
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+    <div th:replace="/shared/header"></div>
+    <div th:replace="/shared/sidebar"></div>
+    <div class="content-wrapper">
+        <section class="content">
+            <div layout:fragment="content"></div>
+        </section>
+    </div>
+    <div th:replace="/shared/footer"></div>
+</div>
+<script th:replace="/shared/scripts"></script>
+<script layout:fragment="scripts"></script>
+</body>
+</html>

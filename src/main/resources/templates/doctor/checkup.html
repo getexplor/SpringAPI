@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      layout:decorator="layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+<div layout:fragment="content" id="apps-checkup">
+    <div class="box">
+        <div class="box-body">
+
+            <div class="col-sm-12">
+                <form class="form-horizontal" @submit.prevent="postEdit()">
+                    <input type="hidden"/>
+                    <div class="form-group">
+                        <label class="control-label">Patient Name :</label>
+                        <input type="text" disabled class="form-control" name="name" id="name" v-model="dataPatient.patient.name">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Receipt :</label>
+                        <input type="text" class="form-control" name="receipt" id="receipt" v-model="dataPatient.receipt">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary"  type="submit">Check Up</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script layout:fragment="scripts">
+
+    var url = window.location.pathname;
+    var idPatient = url.substring(url.lastIndexOf('/') + 1);
+    console.log(idPatient)
+
+    new Vue({
+        el: "#apps-checkup",
+        data(){
+            return {
+                dataPatient:[{
+                    receipt : "",
+                    status : true,
+                    patient:{
+                        name:''
+                    }
+                }]
+            }
+        },
+        mounted(){
+            this.getPatient();
+            // this.postEdit();
+
+        },
+        methods: {
+            getPatient(){
+                axios.get("/api/treatments/" + idPatient).then(response => {
+                    this.dataPatient = response.data;
+                }).catch(error => {
+                    console.log(error)
+                });
+            },
+            postEdit : function (){
+                this.dataPatient = {
+                    receipt: this.dataPatient.receipt,
+                    status: true
+                }
+                axios.put("/api/treatments/" + idPatient, this.dataPatient).then(response =>{
+                    console.log(response)
+                    window.location.href = "/doctor"
+                }).catch(error => {
+                    console.log(error)
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

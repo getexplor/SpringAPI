@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml"
+      layout:decorator="layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin</title>
+</head>
+<body>
+<div layout:fragment="content" id="apps-admin">
+    <h1>Data Patient</h1>
+    <div class="row">
+        <div class="col-sm-12 mb-3">
+            <a th:href="@{/admin/formPatient}" class="btn btn-primary">Register Patient</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="table">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Patient Name</th>
+                        <th>Patient Treatment</th>
+                        <th>Doctor Treatment</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item, iter in tableData">
+                        <td>{{iter + 1}}</td>
+                        <td>{{item.name}}</td>
+                        <td>{{item.treatment}}</td>
+                        <td>{{item.doctor.name}}</td>
+                        <td>
+                            <a v-bind:href="'/admin/edit/' + item.id" class="btn btn-warning">Edit</a>
+                            <button v-on:click="deletePatient(item.id)" class="btn btn-danger">Delete</button>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script layout:fragment="scripts">
+    new Vue({
+        el: "#apps-admin",
+        data(){
+            return {
+                tableData: [{
+                    id : '',
+                    name : '',
+                    status : '',
+                    treatment : '',
+                    doctor : {
+                        id: '',
+                        name: ''
+                    }
+                }]
+            }
+        },
+        mounted(){
+            const role = localStorage.getItem("roleId");
+            if(role != 1 || role == ""){
+                window.location.href = "/login"
+            }
+            this.getPatient();
+        },
+        methods: {
+            getPatient(){
+
+                axios.get("/api/patients").then(response => {
+                    this.tableData = response.data;
+                }).catch(error => {
+                    console.log(error)
+                });
+            },
+            deletePatient : function (id){
+                axios.delete("/api/patients/" + id).then(response => {
+                    window.location.reload()
+                    console.log(response)
+                }).catch(error => {
+                    console.log(error)
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

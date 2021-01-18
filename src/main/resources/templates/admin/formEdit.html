@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      layout:decorator="layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+<div layout:fragment="content" id="apps-edit">
+    <div class="box">
+        <div class="box-body">
+
+            <div class="col-sm-12">
+                <form class="form-horizontal" @submit.prevent="postEdit()">
+                    <input type="hidden"/>
+                    <div class="form-group">
+                        <label class="control-label">Patient Name :</label>
+                        <input type="text" class="form-control" name="name" id="name" v-model="dataPatient.name">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Patient Treatment :</label>
+                        <input type="text" class="form-control" name="treatment" id="treatment" v-model="dataPatient.treatment">
+                    </div>
+                    <div class="form-group">
+                        <label>Select Doctor Treatment</label>
+                        <select class="form-control" id="idDoctor" name="id" v-model="dataPatient.doctor.id">
+                            <option v-for="item in dataDoctor" :value="item.id">{{item.name}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="submit">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script layout:fragment="scripts">
+
+    var url = window.location.pathname;
+    var idPatient = url.substring(url.lastIndexOf('/') + 1);
+    console.log(idPatient)
+
+    new Vue({
+        el: "#apps-edit",
+        data(){
+            return {
+                dataPatient:{
+                    name : "",
+                    treatment : "",
+                    status : false,
+                    doctor : [{
+                        id : null
+                    }]
+                },
+                dataDoctor:[],
+            }
+        },
+        mounted(){
+            this.getPatient();
+            this.getDoctor();
+            this.postEdit();
+
+        },
+        methods: {
+            getPatient(){
+                axios.get("/api/patients/" + idPatient).then(response => {
+                    this.dataPatient = response.data;
+                }).catch(error => {
+                    console.log(error)
+                });
+            },
+            getDoctor(){
+                axios.get("/api/doctors").then(response => {
+                    this.dataDoctor = response.data;
+                }).catch(error => {
+                    console.log(error)
+                });
+            },
+            postEdit:function (){
+                this.dataPatient = {
+                    name : this.dataPatient.name,
+                    treatment : this.dataPatient.treatment,
+                    doctor : {
+                        id : this.dataPatient.doctor.id
+                    }
+                }
+                axios.put("/api/patients/" + idPatient, this.dataPatient).then(response => {
+                    console.log(response)
+                    window.location.href = "/admin"
+                }).catch(error => {
+                    console.log(error)
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

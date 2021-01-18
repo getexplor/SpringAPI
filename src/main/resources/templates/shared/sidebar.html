@@ -1,0 +1,62 @@
+<aside class="main-sidebar" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar" id="sideBarComponent">
+        <!-- sidebar menu: : style can be found in sidebar.less -->
+        <ul class="sidebar-menu" data-widget="tree">
+            <li v-if="show.admin"><a th:href="@{/admin}"><i class="fa fa-circle-o text-red"></i> <span>Admin</span></a></li>
+            <li v-if="show.nurse"><a th:href="@{/nurse}"><i class="fa fa-circle-o text-yellow"></i> <span>Nurse</span></a></li>
+            <li v-if="show.doctor"><a th:href="@{/doctor}"><i class="fa fa-circle-o text-aqua"></i> <span>Doctor</span></a></li>
+            <li v-if="show.pharmacist"><a th:href="@{/pharmacist}"><i class="fa fa-circle-o text-green"></i> <span>Pharmacist</span></a></li>
+            <li><a v-on:click="logout()"><i class="fa fa-circle-o text-green"></i> <span>Logout</span></a></li>
+        </ul>
+    </section>
+    <!-- /.sidebar -->
+</aside>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+<script>
+    new Vue({
+        el: '#sideBarComponent',
+        data(){
+            return {
+                show: {
+                    admin: false,
+                    nurse: false,
+                    doctor: false,
+                    pharmacist: false
+                }
+            }
+        },
+        mounted(){
+            const role = localStorage.getItem("roleId");
+            console.log(role);
+            if(role == 1){
+                Object.keys(this.show).map(item => {
+                    this.show[item] = false
+                });
+                this.show.admin = true;
+            }else if(role == 2){
+                Object.keys(this.show).map(item => {
+                    this.show[item] = false
+                });
+                this.show.nurse = true;
+            }else if(role == 3){
+                Object.keys(this.show).map(item => {
+                    this.show[item] = false
+                });
+                this.show.doctor = true;
+            }else if(role == 4){
+                Object.keys(this.show).map(item => {
+                    this.show[item] = false
+                });
+                this.show.pharmacist = true;
+            }
+        },
+        methods : {
+            logout : function (){
+                localStorage.clear();
+                window.location.href = "/login";
+            }
+        }
+    })
+</script>

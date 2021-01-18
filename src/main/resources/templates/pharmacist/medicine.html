@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      layout:decorator="layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+<div layout:fragment="content" id="apps-medicine">
+    <div class="box">
+        <div class="box-body">
+
+            <div class="col-sm-12">
+                <form class="form-horizontal" @submit.prevent="postMedicine()">
+                    <div class="form-group">
+                        <label class="control-label">Patient Name :</label>
+                        <input type="text" disabled class="form-control" name="name" id="name" v-model="dataPatient.treatments.patient.name">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Doctor Treatment :</label>
+                        <input type="text" disabled class="form-control" name="doctorName" id="doctorName" v-model="dataPatient.treatments.doctor.name">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Patient Treatment :</label>
+                        <input type="text" disabled class="form-control" name="treatment" id="treatment" v-model="dataPatient.treatments.patient.treatment">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Receipt Treatment :</label>
+                        <input type="text" disabled class="form-control" name="receipt" id="receipt" v-model="dataPatient.treatments.receipt">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Medicine Patient :</label>
+                        <input type="text" class="form-control" name="medicine" id="medicine" v-model="dataPatient.medicine">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Total Medicine Patient :</label>
+                        <input type="text" class="form-control" name="totalMedicine" id="totalMedicine" v-model="dataPatient.totalMedicine">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="submit">Submit Medicine</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script layout:fragment="scripts">
+
+    var url = window.location.pathname;
+    var idPatient = url.substring(url.lastIndexOf('/') + 1);
+    console.log(idPatient)
+
+    new Vue({
+        el: "#apps-medicine",
+        data(){
+            return {
+                dataPatient: {
+                    id : '',
+                    totalMedicine : '',
+                    status : '',
+                    medicine : '',
+                    treatments : {
+                        receipt : '',
+                        patient:{
+                            name : '',
+                            treatment: ''
+                        },
+                        doctor : {
+                            name : ''
+                        }
+                    }
+                }
+            }
+        },
+        mounted(){
+            this.getData()
+            // this.postMedicine();
+        },
+        methods: {
+            getData(){
+                axios.get("/api/pharmacists/" + idPatient).then(response => {
+                    this.dataPatient = response.data;
+                }).catch(error => {
+                    console.log(error)
+                });
+            },
+            postMedicine : function (){
+                this.dataPatient = {
+                    medicine: this.dataPatient.medicine,
+                    totalMedicine: this.dataPatient.totalMedicine
+                }
+                axios.put("/api/pharmacists/" + idPatient, this.dataPatient).then(response => {
+                    window.location.href = "/pharmacist"
+                    console.log(response);
+                }).catch(error => {
+                    console.log(error);
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>
